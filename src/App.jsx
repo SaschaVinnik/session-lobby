@@ -6,6 +6,7 @@ import { createRoom } from './rooms/createRooms';
 import { joinRoom } from './rooms/joinRoom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {config} from './wagmiConfig.ts';
+import {supabase} from '../src/client.ts' 
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,24 @@ function AppInner() {
     if (room && room.player1_fid === address) {
     }
   }, [address, room]);
+
+  useEffect(() => {
+    if (room) {
+      // Подписка на изменения в комнате
+      const roomSubscription = supabase
+        .from(`rooms:id=eq.${room.id}`) // Подписываемся на изменения в конкретной комнате
+        .on('UPDATE', (payload) => {
+          console.log('Room updated:', payload);
+          setRoom(payload.new); // Обновляем комнату
+          setRoomMembers([payload.new.player1_fid, payload.new.player2_fid].filter(Boolean)); // Обновляем список игроков
+        })
+        .subscribe();
+
+      return () => {
+        roomSubscription.unsubscribe(); // Отписываемся от обновлений при размонтировании компонента
+      };
+    }
+  }, [room]);
 
   
   return (
@@ -75,13 +94,13 @@ function RoomReady({ room }) {
       <div className='main'>
         <div>
 			<div className='title'>Комната создана</div>
-			<div className='id'>ID комнаты: {room[0].id}</div>
+			<div className='id'>ID комнаты: {room[0] ? room[0].id : room.id}</div>
 		</div>
 		<div>Кто сделал что-то там?</div>
         <div>Игроки в комнате:
 			<ul>
-				<li>{room[0].player1_fid}</li>
-				<li>{room[0].player2_fid}</li>
+				<li>{room[0] ? room[0].player1_fid : room.player1_fid}</li>
+				<li>{room[0] ? room[0].player2_fid : room.player2_fid}</li>
 			</ul>
 		</div>
         
