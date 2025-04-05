@@ -5,19 +5,23 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --dts --format esm,cjs --out-dir dist",
-    "dev": "tsup src/index.ts --watch"
+    "dev": "tsup src/index.ts --watch",
+    "test": "node dist/test.js",
+    "test-build": "tsup src/test.ts --out-dir dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "react": "^18.2.0",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "@types/react": "^19.1.0",
     "eslint": "^9.24.0",
     "prettier": "^3.5.3",
     "tsup": "^8.4.0"
